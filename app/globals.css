@@ -4,81 +4,81 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* ChatGPT Light Mode - Not used, but defined for completeness */
-  --background: oklch(0.98 0 0);
-  --foreground: oklch(0.16 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.16 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.16 0 0);
-  --primary: oklch(0.52 0.22 262.5);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.92 0.02 180);
-  --secondary-foreground: oklch(0.16 0 0);
-  --muted: oklch(0.93 0 0);
-  --muted-foreground: oklch(0.55 0 0);
-  --accent: oklch(0.1 0.24 180);
-  --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.62 0.22 29.2);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.93 0 0);
-  --input: oklch(0.93 0 0);
-  --ring: oklch(0.52 0.22 262.5);
-  --chart-1: oklch(0.65 0.18 142.5);
-  --chart-2: oklch(0.62 0.2 29.2);
-  --chart-3: oklch(0.7 0.18 262.5);
-  --chart-4: oklch(0.68 0.16 45);
-  --chart-5: oklch(0.6 0.15 200);
-  --radius: 0.5rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* ChatGPT Theme - Light mode (minimal used) */
+  --background: #ffffff;
+  --foreground: #0d0d0f;
+  --card: #f7f7f8;
+  --card-foreground: #0d0d0f;
+  --popover: #ffffff;
+  --popover-foreground: #0d0d0f;
+  --primary: #10a37f;
+  --primary-foreground: #ffffff;
+  --secondary: #f7f7f8;
+  --secondary-foreground: #0d0d0f;
+  --muted: #e5e5e5;
+  --muted-foreground: #717171;
+  --accent: #10a37f;
+  --accent-foreground: #ffffff;
+  --destructive: #d97706;
+  --destructive-foreground: #ffffff;
+  --border: #d9d9e3;
+  --input: #f7f7f8;
+  --ring: #10a37f;
+  --chart-1: #10a37f;
+  --chart-2: #1f2937;
+  --chart-3: #6b7280;
+  --chart-4: #d1d5db;
+  --chart-5: #e5e7eb;
+  --radius: 0.625rem;
+  --sidebar: #f7f7f8;
+  --sidebar-foreground: #0d0d0f;
+  --sidebar-primary: #10a37f;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e5e5e5;
+  --sidebar-accent-foreground: #0d0d0f;
+  --sidebar-border: #d9d9e3;
+  --sidebar-ring: #10a37f;
 }
 
 .dark {
-  /* Exact ChatGPT dark theme colors */
-  /* Main background: #0d0d0d, Sidebar: #111111, Text: #ffffff, Accent: #10a37f */
-  --background: oklch(0.051 0.002 280);
-  --foreground: oklch(1 0 0);
-  --card: oklch(0.08 0.002 280);
-  --card-foreground: oklch(1 0 0);
-  --popover: oklch(0.08 0.002 280);
-  --popover-foreground: oklch(1 0 0);
-  --primary: oklch(0.6 0.16 150);
-  --primary-foreground: oklch(0.051 0.002 280);
-  --secondary: oklch(0.067 0.002 280);
-  --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.35 0 0);
-  --muted-foreground: oklch(0.7 0 0);
-  --accent: oklch(0.6 0.16 150);
-  --accent-foreground: oklch(0.051 0.002 280);
-  --destructive: oklch(0.6 0.22 29.2);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.12 0.002 280);
-  --input: oklch(0.1 0.002 280);
-  --ring: oklch(0.6 0.16 150);
-  --chart-1: oklch(0.6 0.16 150);
-  --chart-2: oklch(0.6 0.2 29.2);
-  --chart-3: oklch(0.7 0.18 262.5);
-  --chart-4: oklch(0.68 0.16 45);
-  --chart-5: oklch(0.6 0.15 200);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.269 0 0);
-  --sidebar-ring: oklch(0.439 0 0);
+  /* ChatGPT Dark Theme */
+  --background: #1e1e1e;
+  --foreground: #ffffff;
+  --card: #2a2a2a;
+  --card-foreground: #ffffff;
+  --popover: #2a2a2a;
+  --popover-foreground: #ffffff;
+  --primary: #10a37f;
+  --primary-foreground: #ffffff;
+  --secondary: #303030;
+  --secondary-foreground: #ffffff;
+  --muted: #404040;
+  --muted-foreground: rgba(255, 255, 255, 0.6);
+  --accent: #10a37f;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #404040;
+  --input: #2a2a2a;
+  --ring: #10a37f;
+  --chart-1: #10a37f;
+  --chart-2: #06b6d4;
+  --chart-3: #8b5cf6;
+  --chart-4: #ec4899;
+  --chart-5: #f59e0b;
+  --sidebar: #0f0f10;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #10a37f;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2a2a2c;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #2a2a2c;
+  --sidebar-ring: #10a37f;
 }
 
 @theme inline {
-  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
+  --font-sans: "Geist", "Geist Fallback";
+  --font-mono: "Geist Mono", "Geist Mono Fallback";
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -126,12 +126,31 @@
   }
 }
 
-@layer components {
-  .chat-message {
-    @apply mb-4 animate-in fade-in slide-in-from-bottom-2 duration-300;
-  }
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
 
-  .chat-input-wrapper {
-    @apply relative w-full;
-  }
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #404040;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #505050;
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
