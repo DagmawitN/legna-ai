@@ -1,7 +1,6 @@
+"use client"
+import { LegnaApp } from "@/components/legna-app"
+
 export default function Home() {
-  return (
-    <div className="flex h-screen items-center justify-center text-3xl font-bold">
-      Legna AI
-    </div>
-  );
+  return <LegnaApp />
 }
