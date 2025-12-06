@@ -12,17 +12,6 @@ export const metadata: Metadata = {
   description:
     "AI-powered multilingual marketing assistant for Ethiopian businesses. Generate professional content in Tigrinya, Amharic, and English. Perfect for social media, product descriptions, and business guidance.",
   keywords: ["AI marketing", "Ethiopian business", "multilingual", "Tigrinya", "Amharic", "marketing assistant"],
-  authors: [{ name: "Legna AI" }],
-  creator: "v0.app",
-  generator: "v0.app",
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://legna-ai.vercel.app",
-    title: "Legna AI - Multilingual AI Marketer",
-    description: "AI-powered marketing assistant for Ethiopian entrepreneurs",
-    siteName: "Legna AI",
-  },
   icons: {
     icon: [
       {
