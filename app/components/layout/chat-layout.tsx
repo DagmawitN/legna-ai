@@ -4,8 +4,8 @@ import { useState, useRef, useEffect } from "react"
 import Sidebar from "@/app/components/layout/sidebar"
 import Topbar from "@/app/components/layout/topbar"
 import ChatPanel from "@/app/components/chat/chat-panel"
-import MessageInput from "@/app/components/chat/message-input"
 import WelcomeMessage from "@/app/components/chat/welcome-message"
+import MessageInput from "@/app/components/chat/message-input"
 
 interface ChatLayoutProps {
   isAuthenticated: boolean
@@ -162,11 +162,14 @@ export default function ChatLayout({
                 isLoading={isLoading}
               />
 
+              {/* Unified Message Input - Same style as Welcome Message */}
               <MessageInput
                 onSendMessage={handleSendMessage}
                 language={language}
                 disabled={isLoading}
                 isAuthenticated={isAuthenticated}
+                onShowAuth={onShowAuth}
+                onLanguageChange={onLanguageChange}
               />
             </>
           ) : null}

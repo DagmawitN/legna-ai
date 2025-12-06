@@ -2,7 +2,8 @@
 
 import Image from "next/image"
 import { useState } from "react"
-import { ArrowRight, Lightbulb, PenTool, TrendingUp } from "lucide-react"
+import { ArrowUp } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface WelcomeMessageProps {
   language: "english" | "amharic" | "oromigna"
@@ -44,6 +45,7 @@ const welcomeContent = {
 export default function WelcomeMessage({ language, onLanguageChange, onShowAuth }: WelcomeMessageProps) {
   const content = welcomeContent[language]
   const [isDragging, setIsDragging] = useState(false)
+  const router = useRouter()
 
   const handleFileUpload = () => {
     // Trigger file input click
@@ -79,20 +81,29 @@ export default function WelcomeMessage({ language, onLanguageChange, onShowAuth 
     }
   }
 
+  const navigateHome = () => {
+    router.push('/')
+  }
+
   return (
     <div className="flex-1 overflow-y-auto bg-background scrollbar-hide">
       <div className="min-h-full flex flex-col items-center justify-center px-4 py-8 sm:px-6 md:py-12 lg:px-8">
         <div className="w-full max-w-2xl sm:max-w-3xl space-y-8 sm:space-y-10 md:space-y-12">
+          {/* Header with clickable logo */}
           <div className="flex flex-col items-center space-y-3 sm:space-y-4 text-center pt-6 sm:pt-8">
-            <div className="flex items-center justify-center">
+            <button
+              onClick={navigateHome}
+              className="flex items-center justify-center group cursor-pointer"
+              title="Go to Home"
+            >
               <Image 
                 src="/assets/logo.svg" 
                 alt="LEGNA Logo"  
                 width={100} 
                 height={48} 
-                className="h-12 sm:h-14 md:h-16 w-auto drop-shadow-lg" 
+                className="h-12 sm:h-14 md:h-16 w-auto drop-shadow-lg group-hover:scale-105 transition-transform duration-200" 
               />
-            </div>
+            </button>
             <p className="text-xs sm:text-sm md:text-base text-muted-foreground font-medium tracking-wide px-2">
               {content.subtitle}
             </p>
@@ -120,22 +131,16 @@ export default function WelcomeMessage({ language, onLanguageChange, onShowAuth 
                 rows={1}
               />
 
-              {/* Send button - Top Right */}
+              {/* Send button - Top Right with ArrowUp icon */}
               <button
                 onClick={(e) => {
                   e.stopPropagation()
                   onShowAuth?.("login")
                 }}
-                className="absolute right-3 top-3 sm:right-4 sm:top-4 p-2 sm:p-2.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none transition-all duration-200"
+                className="absolute right-3 top-3 sm:right-4 sm:top-4 p-2.5 sm:p-3 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 focus:outline-none transition-all duration-200 group"
+                aria-label="Send message"
               >
-                <svg
-                  className="h-4 w-4 sm:h-5 sm:w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                </svg>
+                <ArrowUp className="h-5 w-5 sm:h-6 sm:w-6 transform group-hover:scale-110 transition-transform duration-200" />
               </button>
 
               {/* Bottom left controls container */}
@@ -146,13 +151,13 @@ export default function WelcomeMessage({ language, onLanguageChange, onShowAuth 
                     value={language}
                     onChange={(e) => {
                       e.stopPropagation()
-                      onLanguageChange?.(e.target.value as "tigrinya" | "amharic" | "english")
+                      onLanguageChange?.(e.target.value as "english" | "amharic" | "oromigna")
                     }}
                     className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-background border border-border/50 text-foreground text-xs sm:text-sm font-medium hover:border-primary/50 focus:border-primary focus:outline-none transition-all duration-200 appearance-none cursor-pointer backdrop-blur-sm pr-7"
                   >
                     <option value="english">English</option>
                     <option value="amharic">Amharic</option>
-                    <option value="tigrinya">Tigrinya</option>
+                    <option value="oromigna">Oromigna</option>
                   </select>
                   <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
                     <svg className="h-3 w-3 sm:h-4 sm:w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,6 +173,7 @@ export default function WelcomeMessage({ language, onLanguageChange, onShowAuth 
                     handleFileUpload()
                   }}
                   className="flex items-center gap-1.5 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-background border border-border/50 text-foreground text-xs sm:text-sm font-medium hover:border-primary/50 hover:bg-background/80 focus:outline-none transition-all duration-200"
+                  aria-label="Attach file"
                 >
                   <svg 
                     className="h-3 w-3 sm:h-4 sm:w-4" 
@@ -205,7 +211,7 @@ export default function WelcomeMessage({ language, onLanguageChange, onShowAuth 
             </p>
           </div>
 
-          {/* Suggested prompts section */}
+          {/* Suggested prompts section - WITHOUT speech icons */}
           <div className="space-y-3 sm:space-y-4 max-w-2xl mx-auto w-full px-2 sm:px-0">
             <p className="text-xs sm:text-sm text-muted-foreground/70 font-semibold px-2">Suggested prompts</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
@@ -216,6 +222,7 @@ export default function WelcomeMessage({ language, onLanguageChange, onShowAuth 
                   className={`group p-4 sm:p-5 md:p-6 rounded-lg sm:rounded-xl border border-border/50 text-foreground text-xs sm:text-sm md:text-base font-medium transition-all duration-300 text-left hover:border-primary/50 hover:scale-105 active:scale-95 backdrop-blur-sm overflow-hidden relative min-h-[100px] sm:min-h-[120px] ${
                     index === 0 ? "bg-card hover:bg-card/80" : "bg-muted hover:bg-muted/80"
                   }`}
+                  aria-label={`Use prompt: ${prompt}`}
                 >
                   <span className="relative z-10 flex items-center gap-2 sm:gap-3">
                     <span className="text-lg sm:text-xl md:text-2xl">✨</span>
@@ -225,11 +232,14 @@ export default function WelcomeMessage({ language, onLanguageChange, onShowAuth 
               ))}
             </div>
           </div>
-        </div>
 
-      {/* --- Footer Branding (Fixed - Now cleared by pb-20) --- */}
-      <div className="fixed bottom-6 text-xs text-muted-foreground/50 font-mono uppercase tracking-widest z-10">
-        Legna AI • Ethiopia
+          {/* Footer branding - NOT fixed, scrolls with content */}
+          <div className="pt-12 pb-8 text-center">
+            <div className="text-xs text-muted-foreground/50 font-mono uppercase tracking-widest">
+              Legna AI • Ethiopia
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
