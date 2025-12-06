@@ -36,14 +36,16 @@ export default function MessageInput({ onSendMessage, language, disabled, isAuth
   return (
     <div className="flex-shrink-0 border-t border-border bg-background p-4 md:p-6">
       <form onSubmit={handleSubmit} className="max-w-4xl mx-auto flex gap-3">
-        <div className="flex-1 flex items-center gap-2 rounded-full bg-input border border-border px-4 py-3 hover:border-primary/50 transition-colors focus-within:border-primary focus-within:ring-1 focus-within:ring-primary">
+        {/* Remove flex-1 and use fixed width/height */}
+        <div className="flex items-center gap-2 rounded-full bg-input border border-border px-4 py-3 hover:border-primary/50 transition-colors focus-within:border-primary focus-within:ring-1 focus-within:ring-primary w-[900px] h-[215px]">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={isAuthenticated ? placeholders[language] : loginPrompts[language]}
             disabled={disabled}
-            className="flex-1 bg-transparent text-foreground placeholder-muted-foreground focus:outline-none text-sm"
+            // Make the input fill the entire container
+            className="w-full h-full bg-transparent text-foreground placeholder-muted-foreground focus:outline-none text-sm px-2"
           />
           <button type="button" className="p-1.5 text-muted-foreground hover:text-foreground transition-colors">
             <Mic className="h-4 w-4" />
