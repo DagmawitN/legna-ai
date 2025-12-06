@@ -102,6 +102,16 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
 
   const t = authText[language]
 
+  // Map your language prop to the API expected values
+  const mapLanguageToApi = (lang: "tigrinya" | "amharic" | "english") => {
+    const mapping = {
+      tigrinya: "Oromigna", // Using Oromigna as fallback since your API doesn't support Tigrinya
+      amharic: "Amharic",
+      english: "English"
+    }
+    return mapping[lang]
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
