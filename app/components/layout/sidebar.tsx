@@ -1,6 +1,6 @@
 "use client"
 
-import { Plus, MessageSquare, Library, Settings, LogOut, X } from "lucide-react"
+import { Settings, LogOut, X, Plus } from "lucide-react"
 import { useState } from "react"
 
 interface SidebarProps {
@@ -54,6 +54,13 @@ export default function Sidebar({
   const labels = sidebarLabels[language]
   const [isMobileOpen, setIsMobileOpen] = useState(false)
 
+  
+  const logos = {
+    newChat: "/assets/mdi_pencil.svg",
+    search: "/assets/material-symbols_search-rounded.svg",
+    library: "/assets/uil_books.svg",
+  }
+
   return (
     <>
       {/* Desktop/Tablet sidebar */}
@@ -75,7 +82,12 @@ export default function Sidebar({
         {/* New Chat Button */}
         <div className="p-3 flex-shrink-0">
           <button className="w-full flex items-center justify-center gap-3 rounded-lg bg-sidebar-accent hover:bg-sidebar-accent/80 px-3 py-2.5 text-sidebar-foreground font-medium text-sm transition-colors">
-            <Plus className="h-5 w-5" />
+            <img 
+              src={logos.newChat} 
+              alt="New Chat" 
+              className="h-5 w-5"
+              style={{ filter: "var(--sidebar-icon-filter, none)" }}
+            />
             {isOpen && labels.newChat}
           </button>
         </div>
@@ -84,11 +96,21 @@ export default function Sidebar({
         {isOpen && (
           <div className="px-3 space-y-2 flex-shrink-0">
             <button className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent transition-colors text-sm">
-              <MessageSquare className="h-4 w-4" />
+              <img 
+                src={logos.search} 
+                alt="Search" 
+                className="h-4 w-4"
+                style={{ filter: "var(--sidebar-icon-filter, none)" }}
+              />
               {labels.search}
             </button>
             <button className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent transition-colors text-sm">
-              <Library className="h-4 w-4" />
+              <img 
+                src={logos.library} 
+                alt="Library" 
+                className="h-4 w-4"
+                style={{ filter: "var(--sidebar-icon-filter, none)" }}
+              />
               {labels.library}
             </button>
           </div>
@@ -177,18 +199,33 @@ export default function Sidebar({
           {/* Mobile menu items */}
           <div className="p-3 flex-shrink-0">
             <button className="w-full flex items-center justify-center gap-3 rounded-lg bg-sidebar-accent hover:bg-sidebar-accent/80 px-3 py-2.5 text-sidebar-foreground font-medium text-sm transition-colors">
-              <Plus className="h-5 w-5" />
+              <img 
+                src={logos.newChat} 
+                alt="New Chat" 
+                className="h-5 w-5"
+                style={{ filter: "var(--sidebar-icon-filter, none)" }}
+              />
               {labels.newChat}
             </button>
           </div>
 
           <div className="px-3 space-y-2 flex-shrink-0">
             <button className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent transition-colors text-sm">
-              <MessageSquare className="h-4 w-4" />
+              <img 
+                src={logos.search} 
+                alt="Search" 
+                className="h-4 w-4"
+                style={{ filter: "var(--sidebar-icon-filter, none)" }}
+              />
               {labels.search}
             </button>
             <button className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sidebar-foreground hover:bg-sidebar-accent transition-colors text-sm">
-              <Library className="h-4 w-4" />
+              <img 
+                src={logos.library} 
+                alt="Library" 
+                className="h-4 w-4"
+                style={{ filter: "var(--sidebar-icon-filter, none)" }}
+              />
               {labels.library}
             </button>
           </div>
