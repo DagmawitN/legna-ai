@@ -5,7 +5,7 @@ import { ArrowUp } from "lucide-react"
 
 interface MessageInputProps {
   onSendMessage: (message: string) => void
-  language: "english" | "amharic" | "oromigna"
+  language: "english" | "amharic" | "oromic"
   disabled?: boolean
   isAuthenticated: boolean
   onShowAuth?: (mode: "register" | "login") => void
