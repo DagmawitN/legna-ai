@@ -12,6 +12,35 @@ interface AuthModalProps {
   mode?: "register" | "login"
 }
 
+interface LoginResponse {
+  message: string
+  token: string
+  user: {
+    id: string
+    fullName: string
+    email: string
+    preferredLanguage: string
+    country: string | null
+    businessType: string | null
+  }
+}
+
+interface RegisterResponse {
+  user: {
+    id: string
+    fullName: string
+    email: string
+    preferredLanguage: string
+    country: string | null
+    businessType: string | null
+    createdAt: string
+  }
+}
+
+interface ApiError {
+  error: string
+}
+
 const authText = {
   tigrinya: {
     register: "ምዝገባ",
@@ -25,6 +54,10 @@ const authText = {
     loginButton: "ምእታዩ",
     switchToLogin: "ምእታዩ",
     switchToRegister: "ምዝገባ",
+    emailRequired: "ኢመይል ኣለዎ",
+    passwordRequired: "ሚስጢር ቃል ኣለዎ",
+    nameRequired: "ሙሉእ ሽም ኣለዎ",
+    passwordsMatch: "ሚስጢር ቃል ይመሳሰል",
   },
   amharic: {
     register: "ምዝገባ",
@@ -38,6 +71,10 @@ const authText = {
     loginButton: "ግባ",
     switchToLogin: "ግባ",
     switchToRegister: "ምዝገባ",
+    emailRequired: "ኢሜል ያስፈልጋል",
+    passwordRequired: "የይለፍ ቃል ያስፈልጋል",
+    nameRequired: "ሙሉ ስም ያስፈልጋል",
+    passwordsMatch: "የይለፍ ቃሎች ይዛመዳሉ",
   },
   english: {
     register: "Register",
@@ -51,6 +88,10 @@ const authText = {
     loginButton: "Sign In",
     switchToLogin: "Login",
     switchToRegister: "Register",
+    emailRequired: "Email is required",
+    passwordRequired: "Password is required",
+    nameRequired: "Full name is required",
+    passwordsMatch: "Passwords must match",
   },
 }
 
@@ -68,43 +109,116 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
 
   const t = authText[language]
 
+  // Map your language prop to the API expected values
+  const mapLanguageToApi = (lang: "tigrinya" | "amharic" | "english") => {
+    const mapping = {
+      tigrinya: "Oromigna", // Using Oromigna as fallback since your API doesn't support Tigrinya
+      amharic: "Amharic",
+      english: "English"
+    }
+    return mapping[lang]
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+
+    // Client-side validation
+    if (!formData.email) {
+      setError(t.emailRequired)
+      return
+    }
+
+    if (!formData.password) {
+      setError(t.passwordRequired)
+      return
+    }
+
+    if (isRegister) {
+      if (!formData.fullName) {
+        setError(t.nameRequired)
+        return
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        setError(t.passwordsMatch)
+        return
+      }
+    }
+
     setIsLoading(true)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
       if (isRegister) {
-        if (formData.password !== formData.confirmPassword) {
-          setError("Passwords do not match")
-          setIsLoading(false)
-          return
+        // Register API call
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fullName: formData.fullName,
+            email: formData.email.toLowerCase(),
+            password: formData.password,
+            preferredLanguage: mapLanguageToApi(language),
+            businessType: formData.businessName || null,
+          }),
+        })
+
+        const data: RegisterResponse | ApiError = await response.json()
+
+        if (!response.ok) {
+          const errorData = data as ApiError
+          throw new Error(errorData.error || "Registration failed")
         }
 
-        const userData = {
-          id: Date.now().toString(),
-          fullName: formData.fullName,
-          businessName: formData.businessName,
-          email: formData.email,
-          preferredLanguage: language,
+        // After successful registration, automatically log the user in
+        const loginResponse = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email.toLowerCase(),
+            password: formData.password,
+          }),
+        })
+
+        const loginData: LoginResponse | ApiError = await loginResponse.json()
+
+        if (!loginResponse.ok) {
+          const errorData = loginData as ApiError
+          throw new Error(errorData.error || "Auto-login failed after registration")
         }
-        const token = "jwt_token_" + Date.now()
-        onSuccess(userData, token)
+
+        const successData = loginData as LoginResponse
+        onSuccess(successData.user, successData.token)
       } else {
-        const userData = {
-          id: Date.now().toString(),
-          fullName: formData.email.split("@")[0],
-          email: formData.email,
-          preferredLanguage: language,
+        // Login API call
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email.toLowerCase(),
+            password: formData.password,
+          }),
+        })
+
+        const data: LoginResponse | ApiError = await response.json()
+
+        if (!response.ok) {
+          const errorData = data as ApiError
+          throw new Error(errorData.error || "Login failed")
         }
-        const token = "jwt_token_" + Date.now()
-        onSuccess(userData, token)
+
+        const successData = data as LoginResponse
+        onSuccess(successData.user, successData.token)
       }
-    } catch (err) {
-      setError("An error occurred. Please try again.")
+    } catch (err: any) {
+      console.error("Auth error:", err)
+      setError(err.message || "An error occurred. Please try again.")
     } finally {
       setIsLoading(false)
     }
@@ -115,7 +229,11 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
       <div className="w-full max-w-md rounded-lg sm:rounded-2xl bg-card border border-border p-6 sm:p-8 shadow-xl">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-xl sm:text-2xl font-bold text-foreground">{isRegister ? t.register : t.login}</h1>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
+          <button 
+            onClick={onClose} 
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            disabled={isLoading}
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -136,7 +254,8 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   required
-                  className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+                  disabled={isLoading}
+                  className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder={t.fullName}
                 />
               </div>
@@ -147,8 +266,8 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
                   type="text"
                   value={formData.businessName}
                   onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                  required
-                  className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+                  disabled={isLoading}
+                  className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   placeholder={t.businessName}
                 />
               </div>
@@ -162,7 +281,8 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
-              className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+              disabled={isLoading}
+              className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder={t.email}
             />
           </div>
@@ -174,7 +294,8 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
-              className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+              disabled={isLoading}
+              className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder={t.password}
             />
           </div>
@@ -187,7 +308,8 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 required
-                className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+                disabled={isLoading}
+                className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder={t.confirmPassword}
               />
             </div>
@@ -205,7 +327,11 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
 
         <div className="mt-6 pt-6 border-t border-border text-center text-sm text-muted-foreground">
           {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
-          <button onClick={() => setIsRegister(!isRegister)} className="text-primary hover:underline font-medium">
+          <button 
+            onClick={() => setIsRegister(!isRegister)} 
+            className="text-primary hover:underline font-medium"
+            disabled={isLoading}
+          >
             {isRegister ? t.switchToLogin : t.switchToRegister}
           </button>
         </div>
