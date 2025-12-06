@@ -1,127 +1,118 @@
 "use client"
+
 import Image from "next/image"
+import { ArrowRight, Lightbulb, PenTool, TrendingUp } from "lucide-react"
 
 interface WelcomeMessageProps {
-  language: "tigrinya" | "amharic" | "english"
-  onLanguageChange?: (lang: "tigrinya" | "amharic" | "english") => void
+  language: "english" | "amharic" | "oromigna"
+  onLanguageChange?: (lang: "english" | "amharic" | "oromigna") => void
   onShowAuth?: (mode: "register" | "login") => void
 }
 
 const welcomeContent = {
-  tigrinya: {
-    title: "ምንታይ ሓገዘነካ?",
-    subtitle: "ወደ LEGNA-AI እንኳን በደህና መጡ",
-    chooseLanguage: "ቋንቋ ምረጽ",
-    prompts: ["ስዒሪ ብሙዚቃ ቡሕሪ ምጽሓፍ", "ሮደ መስኮት ብሳይክል ገደል", "ኢትዮጵያዊ ታሪክ ምሕዝናት ምጽሓፍ"],
-    askPlaceholder: "ምንዳይ ምሕሳብ",
+  english: {
+    greeting: "Hello",
+    title: "How can I assist you?",
+    subtitle: "Your AI Business Partner",
+    inputPlaceholder: "Ask anything about your business...",
+    prompts: [
+      { icon: <PenTool className="w-5 h-5"/>, text: "Write a caption for a post" },
+      { icon: <TrendingUp className="w-5 h-5"/>, text: "Create a marketing strategy" },
+      { icon: <Lightbulb className="w-5 h-5"/>, text: "Give business growth tips" },
+    ]
   },
   amharic: {
-    title: "እንዴት ሊረዳህ ይችላለሁ?",
-    subtitle: "ወደ LEGNA-AI እንኳን በደህና መጡ",
-    chooseLanguage: "ቋንቋ ምረጽ",
-    prompts: ["ከዚህ ወዶ ሴት ሪእሰ ስዔር ጻፈ", "ምግብ ሞቅ ሊሊት ምጽሓፍ", "ሥራ ፍለጋ ምክር ሰጠ"],
-    askPlaceholder: "ምንዳይ ምሕሳብ",
-  },
-  english: {
-    title: "How can I help?",
-    subtitle: "Welcome to LEGNA-AI",
-    chooseLanguage: "Choose your language",
+    greeting: "ሰላም",
+    title: "እንዴት ልርዳህ?",
+    subtitle: "የንግድ ማስተዳደር አማካሪ",
+    inputPlaceholder: "ስለ ንግድህ ማንኛውንም ጥያቄ ጠይቅ...",
     prompts: [
-      "Help me write a caption for a post",
-      "Help me create a social media post",
-      "Help me Write a business Proposal",
-    ],
-    askPlaceholder: "Ask anything",
+      { icon: <PenTool className="w-5 h-5"/>, text: "ለፌስቡክ ማስታወቂያ ጽሁፍ አዘጋጅ" },
+      { icon: <TrendingUp className="w-5 h-5"/>, text: "የሽያጭ ስልቶችን ንገረኝ" },
+      { icon: <Lightbulb className="w-5 h-5"/>, text: "አዲስ የንግድ ሀሳብ ስጠኝ" },
+    ]
   },
+  oromigna: {
+    greeting: "Akkam",
+    title: "Akkaan si gargaaruu danda'a?",
+    subtitle: "Hojii Kee Milkeessuuf AI Si Gargaaru",
+    inputPlaceholder: "Dhimmoota hojii kee irratti gaafadhu...",
+    prompts: [
+      { icon: <PenTool className="w-5 h-5"/>, text: "Ergaa miidiyaa hawaasaa barreessi" },
+      { icon: <TrendingUp className="w-5 h-5"/>, text: "Tarsiimoo gabaa uumuu" },
+      { icon: <Lightbulb className="w-5 h-5"/>, text: "Gorsa guddina hojii kenni" },
+    ]
+  }
 }
 
 export default function WelcomeMessage({ language, onLanguageChange, onShowAuth }: WelcomeMessageProps) {
   const content = welcomeContent[language]
 
   return (
-    <div className="flex-1 overflow-y-auto bg-background scrollbar-hide">
-      <div className="min-h-full flex flex-col items-center justify-center px-4 py-8 sm:px-6 md:py-12 lg:px-8">
-        <div className="w-full max-w-2xl sm:max-w-3xl space-y-8 sm:space-y-10 md:space-y-12">
-          <div className="flex flex-col items-center space-y-3 sm:space-y-4 text-center pt-6 sm:pt-8">
-            <div className="flex items-center justify-center">
-              <Image src="/assets/logo.svg" alt="LEGNA Logo"  width={100} 
-          height={48} className="h-12 sm:h-14 md:h-16 w-auto drop-shadow-lg" />
-            </div>
-            <p className="text-xs sm:text-sm md:text-base text-muted-foreground font-medium tracking-wide px-2">
-              {content.subtitle}
-            </p>
-          </div>
-
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground text-balance leading-tight text-center px-2">
-            {content.title}
-          </h1>
-
-          <div className="flex flex-col items-center gap-4 sm:gap-5 md:gap-6">
-            <div className="relative w-full max-w-xs sm:max-w-sm">
-              <select
-                value={language}
-                onChange={(e) => onLanguageChange?.(e.target.value as "tigrinya" | "amharic" | "english")}
-                className="w-full px-4 sm:px-5 py-2.5 sm:py-3 rounded-lg bg-muted border border-border/50 text-foreground text-sm sm:text-base font-medium hover:border-primary/50 focus:border-primary focus:outline-none transition-all duration-200 appearance-none cursor-pointer backdrop-blur-sm pr-10 text-center"
-              >
-                <option value="english">English</option>
-                <option value="amharic">Amharic (አማርኛ)</option>
-                <option value="tigrinya">Tigrinya (ትግርኛ)</option>
-              </select>
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted-foreground">
-                <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                </svg>
-              </div>
-            </div>
-            <p className="text-xs sm:text-sm text-muted-foreground font-medium">{content.chooseLanguage}</p>
-          </div>
-
-          <div className="relative max-w-2xl mx-auto w-full px-2 sm:px-0">
-            <input
-              type="text"
-              placeholder={content.askPlaceholder}
-              disabled
-              onClick={() => onShowAuth?.("login")}
-              className="w-full px-4 sm:px-5 py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl bg-muted border border-border/50 text-foreground placeholder-muted-foreground text-sm sm:text-base md:text-lg font-medium hover:border-primary/50 focus:border-primary focus:outline-none transition-all duration-200 cursor-pointer backdrop-blur-sm disabled:opacity-90"
-            />
-            <button
-              onClick={() => onShowAuth?.("login")}
-              className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <svg
-                className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-              </svg>
-            </button>
-          </div>
-
-          <div className="space-y-3 sm:space-y-4 max-w-2xl mx-auto w-full px-2 sm:px-0">
-            <p className="text-xs sm:text-sm text-muted-foreground/70 font-semibold px-2">Suggested prompts</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
-              {content.prompts.map((prompt, index) => (
-                <button
-                  key={index}
-                  onClick={() => onShowAuth?.("login")}
-                  className={`group p-4 sm:p-5 md:p-6 rounded-lg sm:rounded-xl border border-border/50 text-foreground text-xs sm:text-sm md:text-base font-medium transition-all duration-300 text-left hover:border-primary/50 hover:scale-105 active:scale-95 backdrop-blur-sm overflow-hidden relative min-h-[100px] sm:min-h-[120px] ${
-                    index === 0 ? "bg-card hover:bg-card/80" : "bg-muted hover:bg-muted/80"
-                  }`}
-                >
-                  <span className="relative z-10 flex items-center gap-2 sm:gap-3">
-                    <span className="text-lg sm:text-xl md:text-2xl">✨</span>
-                    {prompt}
-                  </span>
-                </button>
-              ))}
-            </div>
+    <div className="flex-1 overflow-y-auto bg-background flex flex-col items-center p-6 sm:pt-12">
+      <div className="w-full max-w-3xl space-y-10 animate-in fade-in zoom-in-95 duration-500 pb-20">
+        <div className="flex flex-col items-center space-y-5 text-center">
+          <Image src="/assets/logo.svg" alt="Legna AI Logo" width={48} height={48} className="w-12 h-12"/>
+          <div className="space-y-3">
+            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-foreground">
+              {content.title}
+            </h1>
+            <p className="text-muted-foreground text-lg font-light">{content.subtitle}</p>
           </div>
         </div>
+        <div className="relative max-w-2xl mx-auto w-full group">
+          <div 
+            onClick={() => onShowAuth?.("register")}
+            className="flex items-center w-full px-5 py-4 rounded-3xl bg-card border border-border hover:border-primary/50 cursor-pointer transition-all duration-200"
+          >
+            <input
+              type="text"
+              readOnly
+              placeholder={content.inputPlaceholder}
+              className="w-full bg-transparent border-none text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-0 text-lg cursor-pointer"
+            />
+            <div className="bg-primary p-2.5 rounded-xl text-primary-foreground group-hover:scale-105 transition-transform duration-300 flex items-center justify-center">
+              <ArrowRight className="w-5 h-5" />
+            </div>
+          </div>
+          <div className="flex justify-center mt-4 gap-3">
+            {(["english", "amharic", "oromigna"] as const).map((lang) => (
+              <button
+                key={lang}
+                onClick={() => onLanguageChange?.(lang)}
+                className={`text-xs font-semibold px-4 py-1.5 rounded-full transition-colors border ${
+                  language === lang 
+                  ? "bg-primary text-primary-foreground border-primary" 
+                  : "text-muted-foreground border-border hover:text-foreground hover:border-foreground/30"
+                }`}
+              >
+                {lang.charAt(0).toUpperCase() + lang.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto w-full">
+          {content.prompts.map((prompt, index) => (
+            <button
+              key={index}
+              onClick={() => onShowAuth?.("register")}
+              className="flex flex-col items-start gap-4 p-5 rounded-xl bg-card border border-border hover:bg-card/70 hover:border-primary/50 transition-all text-left group h-full"
+            >
 
-        {/* Footer spacing */}
-        <div className="h-8 sm:h-12 md:h-16" />
+              <div className="p-3 rounded-lg bg-secondary text-primary border border-primary/20 group-hover:bg-primary group-hover:text-white transition-all duration-300 flex items-center justify-center">
+                {prompt.icon} 
+              </div>
+              <span className="text-base font-medium text-foreground group-hover:text-primary transition-colors">
+                {prompt.text}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* --- Footer Branding (Fixed - Now cleared by pb-20) --- */}
+      <div className="fixed bottom-6 text-xs text-muted-foreground/50 font-mono uppercase tracking-widest z-10">
+        Legna AI • Ethiopia
       </div>
     </div>
   )
