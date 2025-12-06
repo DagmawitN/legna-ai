@@ -3,50 +3,42 @@
 import type React from "react"
 
 import { useState } from "react"
-import { X, Loader2 } from "lucide-react"
+import { X, Loader2, Globe, CheckCircle } from "lucide-react"
 
 interface AuthModalProps {
-  language: "tigrinya" | "amharic" | "english"
+  language: "english" | "amharic" | "oromigna" | "tigrinya"
   onClose: () => void
   onSuccess: (userData: any, token: string) => void
   mode?: "register" | "login"
 }
 
-interface LoginResponse {
-  message: string
-  token: string
-  user: {
-    id: string
-    fullName: string
-    email: string
-    preferredLanguage: string
-    country: string | null
-    businessType: string | null
-  }
-}
+// Language options matching backend
+const languageOptions = [
+  { value: "English", label: "English", nativeName: "English" },
+  { value: "Amharic", label: "Amharic", nativeName: "አማርኛ" },
+  { value: "Oromigna", label: "Oromigna", nativeName: "Afaan Oromoo" },
+]
 
-interface RegisterResponse {
-  user: {
-    id: string
-    fullName: string
-    email: string
-    preferredLanguage: string
-    country: string | null
-    businessType: string | null
-    createdAt: string
-  }
-}
+// Country options
+const countryOptions = [
+  "Ethiopia", "United States", "Canada", "United Kingdom", "Kenya", 
+  "Nigeria", "South Africa", "Germany", "France", "Other"
+]
 
-interface ApiError {
-  error: string
-}
+// Business type options
+const businessTypeOptions = [
+  "Retail", "Technology", "Agriculture", "Education", "Healthcare",
+  "Finance", "Manufacturing", "Services", "Food & Beverage", "Other"
+]
 
 const authText = {
   tigrinya: {
     register: "ምዝገባ",
     login: "ምእታዩ",
     fullName: "ሙሉእ ሽም",
-    businessName: "ስም ንግዳ",
+    businessType: "ኣይነት ንግዲ",
+    country: "ሃገር",
+    preferredLanguage: "ቅድመ ምርጫ ቋንቋ",
     email: "ኢመይል",
     password: "ሚስጢር ቃል",
     confirmPassword: "ሚስጢር ቃል ኢድ ሓሙሳ",
@@ -54,33 +46,33 @@ const authText = {
     loginButton: "ምእታዩ",
     switchToLogin: "ምእታዩ",
     switchToRegister: "ምዝገባ",
-    emailRequired: "ኢመይል ኣለዎ",
-    passwordRequired: "ሚስጢር ቃል ኣለዎ",
-    nameRequired: "ሙሉእ ሽም ኣለዎ",
-    passwordsMatch: "ሚስጢር ቃል ይመሳሰል",
+    or: "ወይ",
+    registrationSuccess: "ምዝገባ ተወዲኡ! ኣብ ታሕቲ ብኢመይልኩምን ፓስዎርድኩምን ክትእተዉ ትኽእሉ ኢኹም።",
   },
   amharic: {
     register: "ምዝገባ",
     login: "ግባ",
     fullName: "ሙሉ ስም",
-    businessName: "የንግድ ስም",
+    businessType: "የንግድ አይነት",
+    country: "አገር",
+    preferredLanguage: "ተመራጭ ቋንቋ",
     email: "ኢሜል",
-    password: "ይለፍ ቃል",
-    confirmPassword: "ይለፍ ቃል ይስገዩ",
+    password: "የይለፍ ቃል",
+    confirmPassword: "የይለፍ ቃል አረጋግጥ",
     registerButton: "ምዝገባ",
     loginButton: "ግባ",
     switchToLogin: "ግባ",
     switchToRegister: "ምዝገባ",
-    emailRequired: "ኢሜል ያስፈልጋል",
-    passwordRequired: "የይለፍ ቃል ያስፈልጋል",
-    nameRequired: "ሙሉ ስም ያስፈልጋል",
-    passwordsMatch: "የይለፍ ቃሎች ይዛመዳሉ",
+    or: "ወይም",
+    registrationSuccess: "ምዝገባዎ ተሳኒዩ! አሁን በኢሜልዎ እና በይለፍ ቃልዎ መግባት ይችላሉ።",
   },
   english: {
     register: "Register",
     login: "Login",
     fullName: "Full Name",
-    businessName: "Business Name",
+    businessType: "Business Type",
+    country: "Country",
+    preferredLanguage: "Preferred Language",
     email: "Email",
     password: "Password",
     confirmPassword: "Confirm Password",
@@ -88,10 +80,8 @@ const authText = {
     loginButton: "Sign In",
     switchToLogin: "Login",
     switchToRegister: "Register",
-    emailRequired: "Email is required",
-    passwordRequired: "Password is required",
-    nameRequired: "Full name is required",
-    passwordsMatch: "Passwords must match",
+    or: "or",
+    registrationSuccess: "Registration successful! You can now login with your email and password.",
   },
 }
 
@@ -100,12 +90,15 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     fullName: "",
-    businessName: "",
     email: "",
     password: "",
     confirmPassword: "",
+    preferredLanguage: "English",
+    country: "",
+    businessType: "",
   })
   const [error, setError] = useState("")
+  const [registrationSuccess, setRegistrationSuccess] = useState(false)
 
   const t = authText[language]
 
@@ -122,26 +115,26 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
-
-    // Client-side validation
-    if (!formData.email) {
-      setError(t.emailRequired)
+    
+    // Validation
+    if (!formData.email || !formData.password) {
+      setError("Email and password are required")
       return
     }
-
-    if (!formData.password) {
-      setError(t.passwordRequired)
-      return
-    }
-
+    
     if (isRegister) {
       if (!formData.fullName) {
-        setError(t.nameRequired)
+        setError("Full name is required")
         return
       }
-
+      
+      if (!formData.preferredLanguage) {
+        setError("Preferred language is required")
+        return
+      }
+      
       if (formData.password !== formData.confirmPassword) {
-        setError(t.passwordsMatch)
+        setError("Passwords do not match")
         return
       }
     }
@@ -150,8 +143,8 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
 
     try {
       if (isRegister) {
-        // Register API call
-        const response = await fetch("/api/auth/register", {
+        // Register the user
+        const registerResponse = await fetch("/api/auth/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -160,41 +153,37 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
             fullName: formData.fullName,
             email: formData.email.toLowerCase(),
             password: formData.password,
-            preferredLanguage: mapLanguageToApi(language),
-            businessType: formData.businessName || null,
+            preferredLanguage: formData.preferredLanguage,
+            country: formData.country || null,
+            businessType: formData.businessType || null,
           }),
         })
 
-        const data: RegisterResponse | ApiError = await response.json()
+        const registerData = await registerResponse.json()
 
-        if (!response.ok) {
-          const errorData = data as ApiError
-          throw new Error(errorData.error || "Registration failed")
+        if (!registerResponse.ok) {
+          throw new Error(registerData.error || "Registration failed")
         }
 
-        // After successful registration, automatically log the user in
-        const loginResponse = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: formData.email.toLowerCase(),
-            password: formData.password,
-          }),
-        })
-
-        const loginData: LoginResponse | ApiError = await loginResponse.json()
-
-        if (!loginResponse.ok) {
-          const errorData = loginData as ApiError
-          throw new Error(errorData.error || "Auto-login failed after registration")
-        }
-
-        const successData = loginData as LoginResponse
-        onSuccess(successData.user, successData.token)
+        // Show success message and switch to login mode
+        setRegistrationSuccess(true)
+        setError("") // Clear any errors
+        
+        // Switch to login mode automatically
+        setIsRegister(false)
+        
+        // Clear password fields but keep email
+        setFormData(prev => ({
+          ...prev,
+          password: "",
+          confirmPassword: ""
+        }))
+        
+        // Don't call onSuccess - we want user to login manually
+        // Don't close the modal - keep it open for login
+        
       } else {
-        // Login API call
+        // Login flow
         const response = await fetch("/api/auth/login", {
           method: "POST",
           headers: {
@@ -206,40 +195,62 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
           }),
         })
 
-        const data: LoginResponse | ApiError = await response.json()
+        const data = await response.json()
 
         if (!response.ok) {
-          const errorData = data as ApiError
-          throw new Error(errorData.error || "Login failed")
+          throw new Error(data.error || "Authentication failed")
         }
 
-        const successData = data as LoginResponse
-        onSuccess(successData.user, successData.token)
+        // Success - call onSuccess with login data (which includes token)
+        onSuccess(data.user, data.token)
+        onClose()
       }
     } catch (err: any) {
-      console.error("Auth error:", err)
       setError(err.message || "An error occurred. Please try again.")
+      console.error("Auth error:", err)
     } finally {
       setIsLoading(false)
     }
   }
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <div className="w-full max-w-md rounded-lg sm:rounded-2xl bg-card border border-border p-6 sm:p-8 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-xl sm:rounded-2xl bg-card border border-border/50 p-6 sm:p-8 shadow-2xl">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-xl sm:text-2xl font-bold text-foreground">{isRegister ? t.register : t.login}</h1>
-          <button 
-            onClick={onClose} 
-            className="text-muted-foreground hover:text-foreground transition-colors"
-            disabled={isLoading}
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Globe className="h-5 w-5 text-primary" />
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground">
+              {isRegister ? t.register : t.login} • LEGNA
+            </h1>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 rounded-lg bg-destructive bg-opacity-10 border border-destructive text-destructive text-sm">
+        {/* Success message after registration */}
+        {registrationSuccess && (
+          <div className="mb-4 p-3 rounded-lg bg-green-500/10 border border-green-500/30 text-green-600 text-sm flex items-start gap-2">
+            <CheckCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="font-medium">Registration Successful!</p>
+              <p className="text-xs mt-1">{t.registrationSuccess}</p>
+            </div>
+          </div>
+        )}
+
+        {error && !registrationSuccess && (
+          <div className="mb-4 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm">
             {error}
           </div>
         )}
@@ -248,69 +259,126 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
           {isRegister && (
             <>
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">{t.fullName}</label>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  {t.fullName} <span className="text-destructive">*</span>
+                </label>
                 <input
                   type="text"
+                  name="fullName"
                   value={formData.fullName}
-                  onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                  onChange={handleInputChange}
                   required
-                  disabled={isLoading}
-                  className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-lg bg-background border border-border px-4 py-2.5 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                   placeholder={t.fullName}
                 />
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t.preferredLanguage} <span className="text-destructive">*</span>
+                  </label>
+                  <select
+                    name="preferredLanguage"
+                    value={formData.preferredLanguage}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full rounded-lg bg-background border border-border px-4 py-2.5 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer transition-all"
+                  >
+                    {languageOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label} ({option.nativeName})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">
+                    {t.country}
+                  </label>
+                  <select
+                    name="country"
+                    value={formData.country}
+                    onChange={handleInputChange}
+                    className="w-full rounded-lg bg-background border border-border px-4 py-2.5 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer transition-all"
+                  >
+                    <option value="">Select country</option>
+                    {countryOptions.map((country) => (
+                      <option key={country} value={country}>
+                        {country}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">{t.businessName}</label>
-                <input
-                  type="text"
-                  value={formData.businessName}
-                  onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                  disabled={isLoading}
-                  className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  placeholder={t.businessName}
-                />
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  {t.businessType}
+                </label>
+                <select
+                  name="businessType"
+                  value={formData.businessType}
+                  onChange={handleInputChange}
+                  className="w-full rounded-lg bg-background border border-border px-4 py-2.5 text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer transition-all"
+                >
+                  <option value="">Select business type</option>
+                  {businessTypeOptions.map((type) => (
+                    <option key={type} value={type}>
+                      {type}
+                    </option>
+                  ))}
+                </select>
               </div>
             </>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">{t.email}</label>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              {t.email} <span className="text-destructive">*</span>
+            </label>
             <input
               type="email"
+              name="email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={handleInputChange}
               required
-              disabled={isLoading}
-              className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              placeholder={t.email}
+              className="w-full rounded-lg bg-background border border-border px-4 py-2.5 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              placeholder="you@example.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">{t.password}</label>
+            <label className="block text-sm font-medium text-foreground mb-2">
+              {t.password} <span className="text-destructive">*</span>
+            </label>
             <input
               type="password"
+              name="password"
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              onChange={handleInputChange}
               required
-              disabled={isLoading}
-              className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              placeholder={t.password}
+              minLength={6}
+              className="w-full rounded-lg bg-background border border-border px-4 py-2.5 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+              placeholder="••••••••"
             />
           </div>
 
           {isRegister && (
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">{t.confirmPassword}</label>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                {t.confirmPassword} <span className="text-destructive">*</span>
+              </label>
               <input
                 type="password"
+                name="confirmPassword"
                 value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                onChange={handleInputChange}
                 required
-                disabled={isLoading}
-                className="w-full rounded-lg bg-background border border-border px-4 py-2 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder={t.confirmPassword}
+                minLength={6}
+                className="w-full rounded-lg bg-background border border-border px-4 py-2.5 text-foreground placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                placeholder="••••••••"
               />
             </div>
           )}
@@ -318,22 +386,32 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+            className="w-full rounded-lg bg-primary px-4 py-3 font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
           >
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
             {isRegister ? t.registerButton : t.loginButton}
           </button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-border text-center text-sm text-muted-foreground">
-          {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
-          <button 
-            onClick={() => setIsRegister(!isRegister)} 
-            className="text-primary hover:underline font-medium"
-            disabled={isLoading}
-          >
-            {isRegister ? t.switchToLogin : t.switchToRegister}
-          </button>
+        <div className="mt-6 pt-6 border-t border-border/50">
+          <div className="text-center text-sm text-muted-foreground">
+            {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
+            <button
+              onClick={() => {
+                setIsRegister(!isRegister)
+                setError("")
+                setRegistrationSuccess(false)
+                setFormData(prev => ({
+                  ...prev,
+                  password: "",
+                  confirmPassword: ""
+                }))
+              }}
+              className="text-primary hover:underline font-medium"
+            >
+              {isRegister ? t.switchToLogin : t.switchToRegister}
+            </button>
+          </div>
         </div>
       </div>
     </div>
