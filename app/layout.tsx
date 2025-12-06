@@ -1,60 +1,26 @@
-import type React from "react"
-import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
 import "./globals.css"
+import { AuthProvider } from "@/app/context/auth-context"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Legna AI - Multilingual AI Marketer for Ethiopian Entrepreneurs",
-  description:
-    "AI-powered multilingual marketing assistant for Ethiopian businesses. Generate professional content in Tigrinya, Amharic, and English. Perfect for social media, product descriptions, and business guidance.",
-  keywords: ["AI marketing", "Ethiopian business", "multilingual", "Tigrinya", "Amharic", "marketing assistant"],
-  icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
-    apple: "/apple-icon.png",
-  },
-}
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 5,
-  userScalable: true,
-  themeColor: "#0d0d0f",
+  title: "LEGNA AI",
+  description: "AI Assistant for Ethiopian Languages",
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <head>
-        <meta name="theme-color" content="#0d0d0f" media="(prefers-color-scheme: dark)" />
-        <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-      </head>
-      <body className={`font-sans antialiased dark bg-background text-foreground`}>
-        {children}
-        <Analytics />
+    <html lang="en">
+      <body className={inter.className}>
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   )
