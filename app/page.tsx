@@ -4,19 +4,20 @@ import { useState } from "react"
 import ChatLayout from "@/app/components/layout/chat-layout"
 import LanguageSelector from "@/app/components/modals/language-modal"
 import { useAuth } from "@/app/context/auth-context"
+import type { AppLanguage } from "@/app/components/layout/chat-layout"
 
 export default function Home() {
   const { user, isAuthenticated, logout } = useAuth()
-  const [language, setLanguage] = useState<"english" | "amharic" | "oromigna" | "tigrinya">("english")
+  const [language, setLanguage] = useState<AppLanguage>("english")
   const [languageSelected, setLanguageSelected] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
 
-  const handleLanguageSelect = (lang: "english" | "amharic" | "oromigna" | "tigrinya") => {
+  const handleLanguageSelect = (lang: AppLanguage) => {
     setLanguage(lang)
     setLanguageSelected(true)
   }
 
-  const handleLanguageChange = (lang: "english" | "amharic" | "oromigna" | "tigrinya") => {
+  const handleLanguageChange = (lang: AppLanguage) => {
     setLanguage(lang)
   }
 

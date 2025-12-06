@@ -4,9 +4,10 @@ import type React from "react"
 
 import { useState } from "react"
 import { X, Loader2, Globe, CheckCircle } from "lucide-react"
+import { AppLanguage } from "@/app/components/layout/chat-layout"
 
 interface AuthModalProps {
-  language: "english" | "amharic" | "oromigna" | "tigrinya"
+  language: AppLanguage
   onClose: () => void
   onSuccess: (userData: any, token: string) => void
   mode?: "register" | "login"
@@ -31,24 +32,23 @@ const businessTypeOptions = [
   "Finance", "Manufacturing", "Services", "Food & Beverage", "Other"
 ]
 
-const authText = {
-  tigrinya: {
-    register: "ምዝገባ",
-    login: "ምእታዩ",
-    fullName: "ሙሉእ ሽም",
-    businessType: "ኣይነት ንግዲ",
-    country: "ሃገር",
-    preferredLanguage: "ቅድመ ምርጫ ቋንቋ",
-    email: "ኢመይል",
-    password: "ሚስጢር ቃል",
-    confirmPassword: "ሚስጢር ቃል ኢድ ሓሙሳ",
-    registerButton: "ምዝገባ",
-    loginButton: "ምእታዩ",
-    switchToLogin: "ምእታዩ",
-    switchToRegister: "ምዝገባ",
-    or: "ወይ",
-    registrationSuccess: "ምዝገባ ተወዲኡ! ኣብ ታሕቲ ብኢመይልኩምን ፓስዎርድኩምን ክትእተዉ ትኽእሉ ኢኹም።",
-  },
+const authText: Record<AppLanguage, {
+  register: string
+  login: string
+  fullName: string
+  businessType: string
+  country: string
+  preferredLanguage: string
+  email: string
+  password: string
+  confirmPassword: string
+  registerButton: string
+  loginButton: string
+  switchToLogin: string
+  switchToRegister: string
+  or: string
+  registrationSuccess: string
+}> = {
   amharic: {
     register: "ምዝገባ",
     login: "ግባ",
@@ -83,6 +83,23 @@ const authText = {
     or: "or",
     registrationSuccess: "Registration successful! You can now login with your email and password.",
   },
+  oromigna: {
+    register: "Galmeessuu",
+    login: "Seenuu",
+    fullName: "Maqaa Guutuu",
+    businessType: "Gosa Daldalaa",
+    country: "Biyya",
+    preferredLanguage: "Afaan Jaalatu",
+    email: "Imeelii",
+    password: "Jecha Iggita",
+    confirmPassword: "Jecha Iggita Mirkaneessi",
+    registerButton: "Galmeessi",
+    loginButton: "Seenuu",
+    switchToLogin: "Seenuu",
+    switchToRegister: "Galmeessuu",
+    or: "yookiin",
+    registrationSuccess: "Galmeessichi milkaa'eedha! Amma imeelii kee fi jecha igtuu keen waliin seenuu dandeessa.",
+  },
 }
 
 export default function AuthModal({ language, onClose, onSuccess, mode = "register" }: AuthModalProps) {
@@ -103,11 +120,11 @@ export default function AuthModal({ language, onClose, onSuccess, mode = "regist
   const t = authText[language]
 
   // Map your language prop to the API expected values
-  const mapLanguageToApi = (lang: "tigrinya" | "amharic" | "english") => {
-    const mapping = {
-      tigrinya: "Oromigna", // Using Oromigna as fallback since your API doesn't support Tigrinya
+  const mapLanguageToApi = (lang: AppLanguage): string => {
+    const mapping: Record<AppLanguage, string> = {
+      english: "English",
       amharic: "Amharic",
-      english: "English"
+      oromigna: "Oromigna"
     }
     return mapping[lang]
   }

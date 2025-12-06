@@ -1,15 +1,16 @@
 "use client"
 
 import { Globe } from "lucide-react"
+import { AppLanguage } from "@/app/components/layout/chat-layout"
 
 interface LanguageModalProps {
-  onSelect: (language: "tigrinya" | "amharic" | "english") => void
+  onSelect: (language: AppLanguage) => void
 }
 
 const languages = [
-  { code: "tigrinya" as const, name: "ትግርኛ", flag: "🇪🇷" },
-  { code: "amharic" as const, name: "አማርኛ", flag: "🇪🇹" },
-  { code: "english" as const, name: "English", flag: "🌐" },
+  { code: "english" as const, name: "English", flag: "🌐", nativeName: "English" },
+  { code: "amharic" as const, name: "አማርኛ", flag: "🇪🇹", nativeName: "Amharic" },
+  { code: "oromigna" as const, name: "Afaan Oromoo", flag: "🇪🇹", nativeName: "Oromigna" },
 ]
 
 export default function LanguageModal({ onSelect }: LanguageModalProps) {
@@ -32,7 +33,10 @@ export default function LanguageModal({ onSelect }: LanguageModalProps) {
             >
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{lang.flag}</span>
-                <span className="text-lg font-medium text-foreground">{lang.name}</span>
+                <div className="flex flex-col">
+                  <span className="text-lg font-medium text-foreground">{lang.name}</span>
+                  <span className="text-sm text-muted-foreground">{lang.nativeName}</span>
+                </div>
               </div>
             </button>
           ))}

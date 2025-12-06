@@ -12,14 +12,6 @@ interface WelcomeMessageProps {
 }
 
 const welcomeContent = {
-  tigrinya: {
-    title: "ምንታይ ሓገዘነካ?",
-    subtitle: "ወደ LEGNA-AI እንኳን በደህና መጡ",
-    chooseLanguage: "ቋንቋ ምረጽ",
-    prompts: ["ስዒሪ ብሙዚቃ ቡሕሪ ምጽሓፍ", "ሮደ መስኮት ብሳይክል ገደል", "ኢትዮጵያዊ ታሪክ ምሕዝናት ምጽሓፍ"],
-    askPlaceholder: "ምንዳይ ምሕሳብ",
-    attachFile: "Attach File",
-  },
   amharic: {
     title: "እንዴት ሊረዳህ ይችላለሁ?",
     subtitle: "ወደ LEGNA-AI እንኳን በደህና መጡ",
@@ -39,6 +31,18 @@ const welcomeContent = {
     ],
     askPlaceholder: "Ask anything",
     attachFile: "Attach File",
+  },
+  oromigna: {
+    title: "Akkam si gargaaru?",
+    subtitle: "Baga nagaan dhuftan LEGNA-AI",
+    chooseLanguage: "Afaan filadhu",
+    prompts: [
+      "Maqaa post koo qorachuu na gargaari",
+      "Post media hawaasaa uumu na gargaari",
+      "Ka'umsa daldalaa barreessuu na gargaari",
+    ],
+    askPlaceholder: "Waan hunda gaafadhu",
+    attachFile: "File maxxansisi",
   },
 }
 
