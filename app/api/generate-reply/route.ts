@@ -1,52 +1,39 @@
-// app/api/generate-reply/route.ts
+// app/api/chat/route.ts
 import { NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { prisma } from "@/lib/prisma";
+import { detectToneFromText, generateReplyText } from "@/lib/gemini";
 
-type Body = {
-  customerMessage?: string;
-  language?: string;
-  tone?: string;
+type ReqBody = {
+  userId: string;
+  message: string;
 };
-
-const API_KEY = process.env.GEMINI_API_KEY;
-const DEFAULT_MODEL = process.env.DEFAULT_MODEL || "gemini-pro";
-
-async function generateReply(params: { customerMessage: string; language?: string; tone?: string }): Promise<string> {
-  const { customerMessage, language = "English", tone = "professional" } = params;
-  const client = new GoogleGenerativeAI(API_KEY!);
-  const model = client.getGenerativeModel({ model: DEFAULT_MODEL });
-
-  const prompt = `
-You are a helpful customer support assistant. Read the customer's message and produce a concise ${tone} reply in ${language}.
-Keep it short (1-3 sentences). Answer directly, and do not include extra commentary.
-
-Customer message:
-"""${customerMessage}"""
-`;
-
-  const result: any = await model.generateContent(prompt);
-  const reply =
-    result?.response?.text?.() ??
-    result?.response?.text ??
-    result?.candidates?.[0]?.content ??
-    JSON.stringify(result);
-
-  return String(reply).trim();
-}
 
 export async function POST(req: Request) {
   try {
-    const body = (await req.json()) as Body;
-    const { customerMessage, language, tone } = body ?? {};
+    const body = (await req.json()) as ReqBody;
+    const { userId, message } = body;
 
-    if (!customerMessage) {
-      return NextResponse.json({ error: "Provide 'customerMessage' in the request body." }, { status: 400 });
+    if (!userId || !message) {
+      return NextResponse.json({ error: "userId and message are required" }, { status: 400 });
     }
 
-    const reply = await generateReply({ customerMessage, language, tone });
-    return NextResponse.json({ reply });
-  } catch (err) {
-    console.error("generate-reply error:", err);
-    return NextResponse.json({ error: String(err) }, { status: 500 });
+    // Fetch user for language preference
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    // Detect tone using Gemini AI
+    const toneResult = await detectToneFromText(message);
+    const tone = toneResult.tone || "neutral"; // fallback if AI fails
+
+    // Generate a realistic reply with Gemini
+    const replyText = await generateReplyText(message, user.preferredLanguage, tone);
+
+    return NextResponse.json({
+      reply: replyText,
+      tone,
+    });
+  } catch (err: any) {
+    console.error("AI chat error:", err);
+    return NextResponse.json({ error: err.message || String(err) }, { status: 500 });
   }
 }
